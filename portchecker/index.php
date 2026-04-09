@@ -7,7 +7,7 @@
 	<meta name="description" content="Verificador de porta é uma ferramenta simples para verificar portas abertas e testar a configuração de encaminhamento de porta em seu roteador.
 		Verifique e diagnostique erros de conexão em seu servidor." />
     <link href="style-v2.css" media="screen" rel="stylesheet" type="text/css" />
-    <link href="favicon-v1.png" rel="shortcut icon" type="image/png" />
+	<link href="favicon-v1.png" rel="shortcut icon" type="image/png" />
   </head>
 
   <body>
@@ -22,20 +22,23 @@
 			* Ver se a conexão está por IPv4 ou IPv6
 		</p>
       </div>
-      <div class="form-wrapper">
+      
+	<div class="form-wrapper">
           <form class="row" id="mainForm" method="post" enctype="multipart/form-data">
             <div class="large-7 columns left-column">
              <div class="row">
                 <div class="small-7 columns">
-                  <label>Endereço IP ou Host</label>
-					<input type="text" name="target_ip" id="targetIP" value="" data-ip="<?php echo $_SERVER['REMOTE_ADDR']; ?>" required/>
-                </div>
-                <div class="small-5 columns options-div">
+                  <label>Endereço IP ou Host: </label>
+					<input type="text" name="target_ip" id="targetIP" value="" data-ip="<?php echo $_SERVER['REMOTE_ADDR']; ?>" required />
+				</div>
+							 
+				<div class="small-5 columns options-div">
                     <a class="button small secondary" id="useCurrentIPButton">Use meu IP</a>
-                </div>
+				</div>
               </div>
-              <div class="input-options">
-                <div class="row">
+			  
+			<div class="input-options">
+            	<div class="row">
                    <div class="small-7 columns">
                      <label>Porta</label>
 						<input type="text" name="port" id="portNumber" value="21" required/>
@@ -75,12 +78,20 @@
 			}
 
 			function check_port($host, $port) {
-				$connection = @fsockopen($host, $port);
-				if (is_resource($connection)) {
-					fclose($connection);
+				$output = shell_exec("nmap -6 -T2 -Pn -p $port $host");
+				$pos = strpos($output, "open");
+				
+				if ( $pos !== false ) {
 					return true;
 				} else {
-					return false;
+					$output = shell_exec("nmap -T2 -Pn -p $port $host");
+					$pos = strpos($output, "open");
+					
+					if ( $pos !== false ) {
+						return true;
+					} else {
+						return false;
+					}
 				}
 			}
 			
